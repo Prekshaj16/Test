@@ -22,7 +22,7 @@ function Login() {
                 console.log(data);
                 if (data.accessToken) {
                     localStorage.setItem("isAuth", "true");
-                    localStorage.setItem("user", JSON.stringify(data)); // add this line
+                    localStorage.setItem("user", JSON.stringify(data)); 
                     navigate("/dashboard");
 
                 } else {
@@ -81,4 +81,4 @@ function Login() {
 
 }
 
-export default Login
+export default Login;

@@ -2,7 +2,7 @@ import { Plus, X, AlertTriangle, LoaderCircle } from "lucide-react"
 
 function AddTodoModal({ onClose, onAdd, newTodo, setNewTodo, addError, setAddError, adding }) {
     return (
-        <div className="fixed inset-0 bg-black/30 z-40 flex items-center justify-center">
+<div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-center justify-center">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 z-50">
 
                 {/* Header */}
@@ -11,16 +11,17 @@ function AddTodoModal({ onClose, onAdd, newTodo, setNewTodo, addError, setAddErr
                         <Plus size={20} className="text-gray-700" />
                         <h2 className="text-lg font-bold text-gray-800">Add New Todo</h2>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition">
+                    <button onClick={onClose} className=" rounded-xl p-1 text-gray-700 transition">
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Input */}
                 <div className="flex flex-col gap-1.5 mb-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Todo</label>
+                    <label className="text-[15px] font-semibold text-gray-500 uppercase tracking-wider">Todo</label>
                     <input
                         type="text"
+                        required
                         value={newTodo}
                         onChange={(e) => { setNewTodo(e.target.value); setAddError(""); }}
                         onKeyDown={(e) => e.key === "Enter" && onAdd()}
@@ -58,4 +59,4 @@ function AddTodoModal({ onClose, onAdd, newTodo, setNewTodo, addError, setAddErr
     )
 }
 
-export default AddTodoModal
+export default AddTodoModal;

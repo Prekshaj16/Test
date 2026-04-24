@@ -20,7 +20,6 @@ function Dashboard() {
     const [adding, setAdding] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
 
-
     const limit = 5;
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const userId = user.id;
@@ -52,11 +51,11 @@ function Dashboard() {
     }, [page, filter]);
 
     useEffect(() => {
-    const stored = parseInt(localStorage.getItem("visitCount") || "0");
-    const updated = stored + 1;
-    localStorage.setItem("visitCount", updated);
-    setVisitCount(updated);
-}, []);
+        const stored = parseInt(localStorage.getItem("visitCount") || "0");
+        const updated = stored + 1;
+        localStorage.setItem("visitCount", updated);
+        setVisitCount(updated);
+    }, []);
 
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit + 1;
@@ -67,7 +66,6 @@ function Dashboard() {
 
     const handleAdd = () => {
         if (!newTodo.trim()) { setAddError("Todo cannot be empty."); return; }
-        if (newTodo.trim().length < 5) { setAddError("Todo must be at least 5 characters."); return; }
 
         setAdding(true);
         fetch("https://dummyjson.com/todos/add", {
@@ -91,12 +89,17 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col">
 
-<Navbar total={total} visitCount={visitCount} />
+            {/* Props passed: total (todo count), visitCount (visit tracker) */}
+            <Navbar total={total} visitCount={visitCount} />
+
             <div className="flex-1 flex flex-col px-8 py-8 max-w-4xl w-full mx-auto">
 
                 {/* Top Bar */}
                 <div className="flex items-center justify-between mb-6">
+
+                    {/* Props passed: filter (current active filter), setFilter (toggle handler) */}
                     <FilterToggle filter={filter} setFilter={setFilter} />
+
                     <button
                         onClick={openModal}
                         className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-700 transition">
@@ -105,6 +108,7 @@ function Dashboard() {
                     </button>
                 </div>
 
+                {/* Props passed: todos (list data), loading, error, filter, total, start, end (pagination info) */}
                 <TodoList
                     todos={todos}
                     loading={loading}
@@ -115,11 +119,13 @@ function Dashboard() {
                     end={end}
                 />
 
+                {/* Props passed: page (current page), totalPages, setPage (page change handler) */}
                 {!loading && !error && todos.length > 0 && filter === "all" && (
                     <Pagination page={page} totalPages={totalPages} setPage={setPage} />
                 )}
             </div>
 
+            {/* Props passed: onClose, onAdd, newTodo, setNewTodo, addError, setAddError, adding */}
             {modal && (
                 <AddTodoModal
                     onClose={closeModal}

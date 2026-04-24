@@ -24,4 +24,4 @@ function TodoItem({ todo, isLast }) {
     )
 }
 
-export default TodoItem
+export default TodoItem;
