@@ -47,4 +47,4 @@ This is a small React-based web application built as part of a frontend assessme
 
 ```bash
 npm install
-npm start
+npm run dev
