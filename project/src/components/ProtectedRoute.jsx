@@ -1,5 +1,4 @@
 import { Navigate } from "react-router-dom";
-localStorage.removeItem("isAuth");
 
 function ProtectedRoute({ children }) {
   const isAuth = localStorage.getItem("isAuth") === "true";

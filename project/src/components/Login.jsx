@@ -22,7 +22,9 @@ function Login() {
                 console.log(data);
                 if (data.accessToken) {
                     localStorage.setItem("isAuth", "true");
-                    localStorage.setItem("user", JSON.stringify(data)); 
+                    localStorage.setItem("user", JSON.stringify(data)); // add this line
+                    const loginCount = Number(localStorage.getItem("loginCount") || "0");
+                    localStorage.setItem("loginCount", String(loginCount + 1));
                     navigate("/dashboard");
 
                 } else {
@@ -81,4 +83,4 @@ function Login() {
 
 }
 
-export default Login;
+export default Login

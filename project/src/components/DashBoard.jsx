@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Plus } from "lucide-react"
+import { useNavigate } from 'react-router-dom'
 import Navbar from "../components/Navbar"
 import FilterToggle from "../components/FilterToggle"
 import TodoList from "../components/TodoList"
@@ -18,9 +19,11 @@ function Dashboard() {
     const [newTodo, setNewTodo] = useState("");
     const [addError, setAddError] = useState("");
     const [adding, setAdding] = useState(false);
-    const [visitCount, setVisitCount] = useState(0);
+    const [loginCount] = useState(() => Number(localStorage.getItem("loginCount") || "0"));
+    const navigate = useNavigate();
 
-    const limit = 5;
+
+    const limit = 3;
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const userId = user.id;
 
@@ -34,7 +37,7 @@ function Dashboard() {
 
         const skip = (page - 1) * limit;
         const url = filter === "mine"
-            ? `https://dummyjson.com/users/${userId}/todos`
+            ? `https://dummyjson.com/users/${userId}/todos?limit=${limit}&skip=${skip}`
             : `https://dummyjson.com/todos?limit=${limit}&skip=${skip}`;
 
         fetch(url)
@@ -50,13 +53,6 @@ function Dashboard() {
             });
     }, [page, filter]);
 
-    useEffect(() => {
-        const stored = parseInt(localStorage.getItem("visitCount") || "0");
-        const updated = stored + 1;
-        localStorage.setItem("visitCount", updated);
-        setVisitCount(updated);
-    }, []);
-
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit + 1;
     const end = Math.min(page * limit, total);
@@ -64,8 +60,15 @@ function Dashboard() {
     const openModal = () => { setNewTodo(""); setAddError(""); setModal(true); };
     const closeModal = () => { setModal(false); setNewTodo(""); setAddError(""); };
 
+    const handleLogout = () => {
+        localStorage.removeItem("isAuth");
+        localStorage.removeItem("user");
+        navigate("/");
+    };
+
     const handleAdd = () => {
         if (!newTodo.trim()) { setAddError("Todo cannot be empty."); return; }
+        if (newTodo.trim().length < 5) { setAddError("Todo must be at least 5 characters."); return; }
 
         setAdding(true);
         fetch("https://dummyjson.com/todos/add", {
@@ -86,20 +89,48 @@ function Dashboard() {
             });
     };
 
+    const handleToggleTodo = (todo) => {
+        if (Number(todo.userId) !== Number(userId)) {
+            return;
+        }
+
+        const nextCompleted = !todo.completed;
+
+        fetch(`https://dummyjson.com/todos/${todo.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                completed: nextCompleted,
+                todo: todo.todo,
+                userId: todo.userId || userId || 5,
+            }),
+        })
+            .then(res => res.json())
+            .then((updated) => {
+                setTodos((currentTodos) =>
+                    currentTodos.map((item) =>
+                        item.id === todo.id ? { ...item, ...updated, completed: nextCompleted } : item
+                    )
+                );
+            })
+            .catch(() => {
+                setTodos((currentTodos) =>
+                    currentTodos.map((item) =>
+                        item.id === todo.id ? { ...item, completed: todo.completed } : item
+                    )
+                );
+            });
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col">
 
-            {/* Props passed: total (todo count), visitCount (visit tracker) */}
-            <Navbar total={total} visitCount={visitCount} />
-
+<Navbar total={total} loginCount={loginCount} onLogout={handleLogout} />
             <div className="flex-1 flex flex-col px-8 py-8 max-w-4xl w-full mx-auto">
 
                 {/* Top Bar */}
                 <div className="flex items-center justify-between mb-6">
-
-                    {/* Props passed: filter (current active filter), setFilter (toggle handler) */}
                     <FilterToggle filter={filter} setFilter={setFilter} />
-
                     <button
                         onClick={openModal}
                         className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-700 transition">
@@ -108,7 +139,6 @@ function Dashboard() {
                     </button>
                 </div>
 
-                {/* Props passed: todos (list data), loading, error, filter, total, start, end (pagination info) */}
                 <TodoList
                     todos={todos}
                     loading={loading}
@@ -117,15 +147,15 @@ function Dashboard() {
                     total={total}
                     start={start}
                     end={end}
+                    currentUserId={userId}
+                    onToggle={handleToggleTodo}
                 />
 
-                {/* Props passed: page (current page), totalPages, setPage (page change handler) */}
                 {!loading && !error && todos.length > 0 && filter === "all" && (
                     <Pagination page={page} totalPages={totalPages} setPage={setPage} />
                 )}
             </div>
 
-            {/* Props passed: onClose, onAdd, newTodo, setNewTodo, addError, setAddError, adding */}
             {modal && (
                 <AddTodoModal
                     onClose={closeModal}

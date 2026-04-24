@@ -1,7 +1,7 @@
 import { LoaderCircle, AlertTriangle, ClipboardX } from "lucide-react"
 import TodoItem from "./TodoItem"
 
-function TodoList({ todos, loading, error, filter, total, start, end }) {
+function TodoList({ todos, loading, error, filter, total, start, end, currentUserId, onToggle }) {
 
     if (loading) return (
         <div className="flex-1 flex items-center justify-center gap-3 text-gray-500 text-base">
@@ -32,12 +32,14 @@ function TodoList({ todos, loading, error, filter, total, start, end }) {
                     : `Showing all ${total} todos for your account`}
             </p>
 
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex-1">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-y-auto max-h-[240px]">
                 {todos.map((todo, idx) => (
                     <TodoItem
                         key={todo.id}
                         todo={todo}
                         isLast={idx === todos.length - 1}
+                        canToggle={Number(todo.userId) === Number(currentUserId)}
+                        onToggle={onToggle}
                     />
                 ))}
             </div>
